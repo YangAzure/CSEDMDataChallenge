@@ -121,6 +121,8 @@ from sklearn.model_selection import cross_validate
 from sklearn.neural_network import MLPClassifier
 clf = MLPClassifier()
 
+X = student_problem_concat_df[['PrevMedianAttempt', 'PrevMaxAttempt', 'PrevScore', 'AttemptMean', 'ScoreMean']]
+y = student_problem_concat_df['StudentPerformance']
 cv_results = cross_validate(clf, X, y, groups = main_df['SubjectID'],
                             cv=5, scoring=('accuracy', 'f1'), return_train_score=True)
 
