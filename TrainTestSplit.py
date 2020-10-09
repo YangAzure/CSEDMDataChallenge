@@ -40,8 +40,10 @@ subject_df[subject_df['SubjectID'].isin(all_main_df[all_main_df['SubjectID'].isi
 
 # SubjectProblem.csv
 
+# SubjectProblem.csv
 subject_problem_df = all_main_df[['SubjectID', 'ProblemID']]
 median_problemID = all_main_df.groupby(['ProblemID'])[['Attempt']].median() 
+median_problemID.rename(columns = {'Attempt': 'Median_Attempt'}, inplace = True)
 subject_problem_df = subject_problem_df.join(median_problemID, on=['ProblemID'], rsuffix = '_median')
 subject_problem_df['StudentLabels'] = [0 if all_main_df['Attempt'][i] > subject_problem_df['Median_Attempt'][i] else 1 for i in range(len(subject_problem_df))]
-subject_problem_df.to_csv("Splitted_data/SubjectProblem.csv",index=False)
+subject_problem_df.to_csv("SubjectProblem.csv",index=False)
