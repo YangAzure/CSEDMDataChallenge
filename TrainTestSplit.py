@@ -1,31 +1,32 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from ProgSnap2 import ProgSnap2Dataset, PS2
+
 np.random.seed(27601)
 
-MainTableLocation = "MainTable.csv"
-CodeStateTableLocation = "LinkTables/CodeStates.csv"
+data = ProgSnap2Dataset('data/CodeWorkout')
 
-SubjectTableLocation = "LinkTables/Subject.csv"
 
-all_main_df = pd.read_csv(MainTableLocation) # Should be subjects.csv: Confirm?
+all_main_df = data.get_main_table()
 
 # Task 3 needs to also split main table: make them train/test folder
-codestate_df = pd.read_csv(CodeStateTableLocation)
-subject_df = pd.read_csv(SubjectTableLocation)
+codestate_df = data.get_code_states_table()
+subject_df = data.load_link_table('Subject')
 
 # Assigning label for Prediction models
 
-## group by three columns -- mulitple problems from multiple data sources
-## course section > ass > prob
-median_thresholds = all_main_df.groupby(['CourseSectionID','AssignmentID','ProblemID'])[['Attempt']].median() 
-all_main_df = all_main_df.join(median_thresholds, on=['CourseSectionID','AssignmentID','ProblemID'], rsuffix='Median') 
+# group by three columns -- mulitple problems from multiple data sources
+# course section > ass > prob
+# TODO: This is definitely not the correct way to calculate the median number of attempts, since the Attempt column is
+# the attempts number, starting at 1 and going up...
+median_thresholds = all_main_df.groupby(['CourseSectionID', 'AssignmentID', 'ProblemID'])[['Attempt']].median()
+all_main_df = all_main_df.join(median_thresholds, on=['CourseSectionID', 'AssignmentID', 'ProblemID'], rsuffix='Median')
 all_main_df['StudentPerformance'] = np.where((all_main_df['Attempt'] > all_main_df['AttemptMedian']), 1, 0)
 
 
-
-train_ID,test_ID = train_test_split(np.unique(all_main_df['SubjectID']),test_size=0.2)
-print("Training set students:",train_ID.size,", test set students:", test_ID.size)
+train_ID, test_ID = train_test_split(data.get_subject_ids(), test_size=0.2)
+print("Training set students:", train_ID.size, ", test set students:", test_ID.size)
 
 all_main_df[all_main_df['SubjectID'].isin(train_ID)].to_csv("Splitted_data/Train/TrainMainTable.csv",index=False) # 2 folders be better,
 all_main_df[all_main_df['SubjectID'].isin(test_ID)].to_csv("Splitted_data/Test/TestMainTable.csv",index=False)
