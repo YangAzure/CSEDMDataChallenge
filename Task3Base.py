@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-# pd.set_option('display.max_rows', 500)
 np.random.seed(27601)
 
+#TODO: Change into ProgSnap2 format and class
 MAIN_TABLE_LOCATION = "Splitted_data/Train/TrainMainTable.csv"
 CODE_STATE_TABLE_LOCATION = "Splitted_data/Train/TrainCodeStates.csv"
 SUBJECT_TABLE_LOCATION = "Splitted_data/Train/TrainSubject.csv"
@@ -17,13 +17,11 @@ subject_df = pd.read_csv(SUBJECT_TABLE_LOCATION)
 main_df = all_main_df[all_main_df['EventType'] == "Run.Program"]
 main_df = main_df.sort_values(by=['ServerTimestamp','Order'])
 
+# Get a list of students
 subjects = list(np.unique(main_df['SubjectID']))
 
-
-
-
+# Only keep early problems 
 main_df['ServerTimestamp'] = pd.to_datetime(main_df['ServerTimestamp'])
-
 main_df = main_df[['CourseSectionID', 'AssignmentID', 'ProblemID', 'SubjectID', 'Score', 'Attempt']]
 early_problems = main_df[['AssignmentID','ProblemID']].drop_duplicates().head(n = EARLY_PROBLEM_NUM).values
 
@@ -66,10 +64,6 @@ for subject in subjects:
 
 all_student_early_problem_df = pd.concat(all_student_early_problem)
     
-    
-
-    
-
 
 # Getting the rank of the students in every problem
 ranked_student_early_problem = []
@@ -94,11 +88,10 @@ for problem in early_problems:
             finally_finished.append(1)
     final_submissions["Finished"] = finally_finished
 
-    # Last priority is 'FirstScoreRank', then 'Score', then 'Attempt'
+    # Last priority is 'FirstScoreRank', then 'Score', then 'Attempt', perfrom ranking here
     student_problem_on_final = final_submissions.sort_values(['Finished','Score','Attempt','FirstScoreRank'], ascending=[False, False, True, True])
 
     student_problem_on_final['ProblemRank'] = list(range(len(student_problem_on_final)))
-    
     
     student_problem_rank = []
     for i in range(student_problem.shape[0]):
@@ -109,8 +102,6 @@ for problem in early_problems:
     
     ranked_student_early_problem.append(student_problem)
 
-
-    
 ranked_student_early_problem_df = pd.concat(ranked_student_early_problem)
 
 
