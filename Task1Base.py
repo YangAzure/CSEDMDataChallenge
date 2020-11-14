@@ -1,56 +1,58 @@
 import pandas as pd
 import numpy as np
+import ProgSnap2
+import datetime
+import re
+
+from sklearn.model_selection import cross_validate 
+from sklearn.neural_network import MLPClassifier
 
 np.random.seed(27601)
 
+# Read tables from files
 MAIN_TABLE_LOCATION = "Splitted_data/Train/TrainMainTable.csv"
 CODE_STATE_TABLE_LOCATION = "Splitted_data/Train/TrainCodeStates.csv"
 
 all_main_df = pd.read_csv(MAIN_TABLE_LOCATION)
 codestate_df = pd.read_csv(CODE_STATE_TABLE_LOCATION)
-
-import datetime
-import re
-
 subjProb = pd.read_csv('Splitted_data/SubjectProblem.csv')
 
-
+# remove duplicates
 main_df = all_main_df.drop_duplicates(subset='CodeStateID', keep='first') 
 main_df.reset_index(inplace = True)
+
+# only keep rows when program is run ("Run.Program")
 for i in range(len(main_df)):
     if main_df['EventType'][i] != 'Run.Program':
         main_df.drop(i)
-        
 main_df.reset_index(inplace = True, drop=True)
 
-score_1 = main_df[main_df['Score'] == 1]
-score_1.reset_index(inplace = True, drop=True)
-
-grouper = main_df.groupby(['SubjectID', 'ServerTimestamp'])
-scores_1 = grouper['Score'].count().to_frame(name = 'Count').reset_index()
-scores_1.drop(['Count'], axis=1, inplace = True)
+# get maximum time for each student
 grouper_time = main_df.groupby(['SubjectID'])
 max_times = grouper_time['ServerTimestamp'].max().to_frame(name = "MaxTimeStamp").reset_index()
 
-
+# choose only the first time student submits problem with Score = 1
 score_1 = main_df[main_df['Score'] == 1]
 subj_time = {} 
+
+# store first timestamp (i[4]) score == 1 for each student (i[1])
 for i in score_1.values:
     if i[1] not in subj_time:
         subj_time[i[1]] = i[3]
 
+# remove all rows with time stamp after score =1 first time
 for i in range(len(main_df)):
     if main_df['SubjectID'][i] in subj_time:
         if main_df['ServerTimestamp'][i] > subj_time[main_df['SubjectID'][i]]:
             main_df.drop(i)
             
-
-
+# remove all subject and problem id duplicate rows only keeping the last occurence
 main_df = main_df.drop_duplicates(subset=['SubjectID','ProblemID'], keep='last') 
-CodeStateTableLocation = "Splitted_data/Train/TrainCodeStates.csv"
 
+# sort by order
 main_df.sort_values(by=['Order'], inplace = True)
 
+# convert servertime to datetime type
 main_df['ServerTimestamp'] = pd.to_datetime(main_df['ServerTimestamp']).astype('int')
 
 # Getting a full list of students
@@ -117,12 +119,13 @@ student_problem_concat_df = pd.concat(student_problem_df_list)
 
 
 # Cross validation
-from sklearn.model_selection import cross_validate 
-from sklearn.neural_network import MLPClassifier
 clf = MLPClassifier()
 
+# X and y for MLP
 X = student_problem_concat_df[['PrevMedianAttempt', 'PrevMaxAttempt', 'PrevScore', 'AttemptMean', 'ScoreMean']]
 y = student_problem_concat_df['StudentPerformance']
+
+# cv with accuracy and F1 score
 cv_results = cross_validate(clf, X, y, groups = main_df['SubjectID'],
                             cv=5, scoring=('accuracy', 'f1'), return_train_score=True)
 
