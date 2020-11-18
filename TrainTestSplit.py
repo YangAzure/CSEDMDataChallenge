@@ -5,12 +5,12 @@ from os import path
 from ProgSnap2 import ProgSnap2Dataset, PS2
 
 np.random.seed(27601)
-TARGET_TRAIN_PATH = "Train"
-TARGET_TEST_PATH = "Test"
+TARGET_TRAIN_PATH = "SplittedData/Train"
+TARGET_TEST_PATH = "SplittedData/Test"
 
 data = ProgSnap2Dataset('.')
-train_data = ProgSnap2Dataset('TARGET_TRAIN_PATH')
-test_data = ProgSnap2Dataset('TARGET_TEST_PATH')
+train_data = ProgSnap2Dataset(TARGET_TRAIN_PATH)
+test_data = ProgSnap2Dataset(TARGET_TEST_PATH)
 
 all_main_df = data.get_main_table()
 codestate_df = data.get_code_states_table()

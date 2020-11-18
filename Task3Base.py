@@ -1,17 +1,17 @@
 import pandas as pd
 import numpy as np
+from ProgSnap2 import ProgSnap2Dataset, PS2
 np.random.seed(27601)
 
-#TODO: Change into ProgSnap2 format and class
-MAIN_TABLE_LOCATION = "Splitted_data/Train/TrainMainTable.csv"
-CODE_STATE_TABLE_LOCATION = "Splitted_data/Train/TrainCodeStates.csv"
-SUBJECT_TABLE_LOCATION = "Splitted_data/Train/TrainSubject.csv"
+TRAIN_PATH = "SplittedData/Train"
+
 EARLY_PROBLEM_NUM = 10 # Using a date (Check the cutoff days, see the clusters of the dates or the weekdays) (How many weeks of data would it take to do the early prediction)
 
+data = ProgSnap2Dataset(TRAIN_PATH)
 
-all_main_df = pd.read_csv(MAIN_TABLE_LOCATION)
-codestate_df = pd.read_csv(CODE_STATE_TABLE_LOCATION)
-subject_df = pd.read_csv(SUBJECT_TABLE_LOCATION)
+all_main_df = data.get_main_table()
+codestate_df = data.get_code_states_table()
+subject_df = data.load_link_table('Subject')
 
 # Only keeping one row for each submmission
 main_df = all_main_df[all_main_df['EventType'] == "Run.Program"]
@@ -128,13 +128,10 @@ for subject in subjects:
     # Rank the students on the problems and use the rank (avg score rank)
     # Standardization attempts and score
     
-    # Ask how did the grade consist of 
-    
 
 from sklearn.model_selection import cross_validate # Cross validation on students
-from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import LinearRegression
-# reg = MLPRegressor()
+
 reg = LinearRegression()
 cv_results = cross_validate(reg, 
                             X, 
