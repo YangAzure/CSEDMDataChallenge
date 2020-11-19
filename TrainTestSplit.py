@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from os import path
 from ProgSnap2 import ProgSnap2Dataset, PS2
 
+
 np.random.seed(27601)
 TARGET_TRAIN_PATH = "SplittedData/Train"
 TARGET_TEST_PATH = "SplittedData/Test"
@@ -39,4 +40,7 @@ median_problemID = all_main_df.groupby(['ProblemID'])[['Attempt']].median()
 median_problemID.rename(columns = {'Attempt': 'Median_Attempt'}, inplace = True)
 subject_problem_df = subject_problem_df.join(median_problemID, on=['ProblemID'], rsuffix = '_median')
 subject_problem_df['StudentLabels'] = [0 if all_main_df['Attempt'][i] > subject_problem_df['Median_Attempt'][i] else 1 for i in range(len(subject_problem_df))]
-subject_problem_df.to_csv("SubjectProblem.csv",index=False)
+
+subject_problem_df[subject_problem_df['SubjectID'].isin(train_ID)].to_csv("SplittedData/Train/Train_SubjectProblem.csv",index=False) 
+subject_problem_df[subject_problem_df['SubjectID'].isin(test_ID)].to_csv("SplittedData/Test/Test_SubjectProblem.csv",index=False)
+

@@ -10,11 +10,11 @@ from sklearn.neural_network import MLPClassifier
 np.random.seed(27601)
 
 # Read tables from files
-MAIN_TABLE_LOCATION = "Splitted_data/Train/TrainMainTable.csv"
-CODE_STATE_TABLE_LOCATION = "Splitted_data/Train/TrainCodeStates.csv"
+TRAIN_PATH = "SplittedData/Train"
+data = ProgSnap2Dataset(TRAIN_PATH)
 
-all_main_df = pd.read_csv(MAIN_TABLE_LOCATION)
-codestate_df = pd.read_csv(CODE_STATE_TABLE_LOCATION)
+all_main_df = data.get_main_table()
+codestate_df = data.get_code_states_table()
 subjProb = pd.read_csv('Splitted_data/SubjectProblem.csv')
 
 # remove duplicates
