@@ -15,7 +15,7 @@ data = ProgSnap2Dataset(TRAIN_PATH)
 
 all_main_df = data.get_main_table()
 codestate_df = data.get_code_states_table()
-subjProb = pd.read_csv('Splitted_data/SubjectProblem.csv')
+subjProb = pd.read_csv('SplittedData/Train/Train_SubjectProblem.csv')
 
 # remove duplicates
 main_df = all_main_df.drop_duplicates(subset='CodeStateID', keep='first') 
