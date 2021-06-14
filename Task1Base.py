@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import ProgSnap2
+from ProgSnap2 import ProgSnap2Dataset
 import datetime
 import re
 
@@ -10,12 +10,12 @@ from sklearn.neural_network import MLPClassifier
 np.random.seed(27601)
 
 # Read tables from files
-TRAIN_PATH = "SplittedData/Train"
+TRAIN_PATH = "data/CodeWorkout/S19"
 data = ProgSnap2Dataset(TRAIN_PATH)
 
 all_main_df = data.get_main_table()
 codestate_df = data.get_code_states_table()
-subjProb = pd.read_csv('SplittedData/Train/Train_SubjectProblem.csv')
+# subjProb = pd.read_csv('SplittedData/Train/Train_SubjectProblem.csv')
 
 # remove duplicates
 main_df = all_main_df.drop_duplicates(subset='CodeStateID', keep='first') 

@@ -34,7 +34,7 @@ class ProgSnap2Dataset:
 
     MAIN_TABLE_FILE = 'MainTable.csv'
     LINK_TABLE_DIR = 'LinkTables'
-    CODE_STATES_TABLE_FILE = 'CodeStates/CodeStates.csv'
+    CODE_STATES_TABLE_FILE = os.path.join('CodeStates', 'CodeStates.csv')
 
     def __init__(self, directory):
         self.directory = directory
@@ -49,15 +49,15 @@ class ProgSnap2Dataset:
         """
         if self.main_table is None:
             self.main_table = pd.read_csv(self.path(ProgSnap2Dataset.MAIN_TABLE_FILE))
-            self.main_table.sort_values(by=[PS2.SubjectID, PS2.Order])
-        return self.main_table
+            self.main_table.sort_values(by=[PS2.SubjectID, PS2.Order], inplace=True)
+        return self.main_table.copy()
 
     def get_code_states_table(self):
         """ Returns a Pandas DataFrame with the code states table form this dataset
         """
         if self.code_states_table is None:
             self.code_states_table = pd.read_csv(self.path(ProgSnap2Dataset.CODE_STATES_TABLE_FILE))
-        return self.code_states_table
+        return self.code_states_table.copy()
 
     def __link_table_path(self):
         return self.path(ProgSnap2Dataset.LINK_TABLE_DIR)
@@ -114,7 +114,7 @@ class ProgSnap2Dataset:
 
 
 if __name__ == '__main__':
-    data = ProgSnap2Dataset('data/CodeWorkout')
+    data = ProgSnap2Dataset('data/CodeWorkout/S19')
     for code in data.get_trace('4d230b683bf9840553ae57f4acc96e81', 32):
         print(code)
         print('-------')
