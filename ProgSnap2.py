@@ -34,7 +34,8 @@ class ProgSnap2Dataset:
 
     MAIN_TABLE_FILE = 'MainTable.csv'
     LINK_TABLE_DIR = 'LinkTables'
-    CODE_STATES_TABLE_FILE = os.path.join('CodeStates', 'CodeStates.csv')
+    CODE_STATES_DIR = 'CodeStates'
+    CODE_STATES_TABLE_FILE = os.path.join(CODE_STATES_DIR, 'CodeStates.csv')
 
     def __init__(self, directory):
         self.directory = directory
@@ -67,7 +68,7 @@ class ProgSnap2Dataset:
         """
         path = self.__link_table_path()
         dirs = os.listdir(path)
-        return [f for f in dirs if os.isfile(path.join(path, f)) and f.endswith('.csv')]
+        return [f for f in dirs if os.path.isfile(os.path.join(path, f)) and f.endswith('.csv')]
 
     def load_link_table(self, link_table):
         """ Returns a Pandas DataFrame with the link table with the given name
@@ -76,6 +77,34 @@ class ProgSnap2Dataset:
         if not link_table.endswith('.csv'):
             link_table += '.csv'
         return pd.read_csv(path.join(self.__link_table_path(), link_table))
+
+    def save_subset(self, path, main_table_filterer, copy_link_tables=True):
+        os.makedirs(os.path.join(path, ProgSnap2Dataset.CODE_STATES_DIR), exist_ok=True)
+        main_table = main_table_filterer(self.get_main_table())
+        main_table.to_csv(os.path.join(path, ProgSnap2Dataset.MAIN_TABLE_FILE), index=False)
+        code_state_ids = main_table[PS2.CodeStateID].unique()
+        code_states = self.get_code_states_table()
+        code_states = code_states[code_states[PS2.CodeStateID].isin(code_state_ids)]
+        code_states.to_csv(os.path.join(path, ProgSnap2Dataset.CODE_STATES_DIR, 'CodeStates.csv'), index=False)
+
+        if not copy_link_tables:
+            return
+
+        os.makedirs(os.path.join(path, ProgSnap2Dataset.LINK_TABLE_DIR), exist_ok=True)
+
+        def indexify(x):
+            return tuple(x) if len(x) > 1 else x[0]
+
+        for link_table_name in self.list_link_tables():
+            link_table = self.load_link_table(link_table_name)
+            columns = [col for col in link_table.columns if col.endswith('ID') and col in main_table.columns]
+            distinct_ids = main_table.groupby(columns).apply(lambda x: True)
+            # TODO: Still need to test this with multi-ID link tables
+            to_keep = [indexify(list(row)) in distinct_ids for index, row in link_table[columns].iterrows()]
+            filtered_link_table = link_table[to_keep]
+            filtered_link_table.to_csv(os.path.join(path, ProgSnap2Dataset.LINK_TABLE_DIR, link_table_name), index=False)
+
+
 
     @staticmethod
     def __to_one(lst, error):
@@ -115,6 +144,8 @@ class ProgSnap2Dataset:
 
 if __name__ == '__main__':
     data = ProgSnap2Dataset('data/CodeWorkout/S19')
-    for code in data.get_trace('4d230b683bf9840553ae57f4acc96e81', 32):
-        print(code)
-        print('-------')
+    # for code in data.get_trace('4d230b683bf9840553ae57f4acc96e81', 32):
+    #     print(code)
+    #     print('-------')
+
+    data.save_subset('data/test/CopyA', lambda df: df[df[PS2.SubjectID].str.startswith('a')])
