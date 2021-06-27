@@ -2,8 +2,6 @@ import sys, os
 from sklearn.metrics import f1_score, accuracy_score
 import pandas as pd
 
-
-
 input_dir = sys.argv[1]
 output_dir = sys.argv[2]
 
@@ -12,10 +10,9 @@ truth_dir = os.path.join(input_dir, 'ref')
 
 
 if not os.path.isdir(submit_dir):
-	print("%s doesn't exist" % submit_dir)
+    print("%s doesn't exist" % submit_dir)
 
 if os.path.isdir(submit_dir) and os.path.isdir(truth_dir):
-
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -33,7 +30,6 @@ if os.path.isdir(submit_dir) and os.path.isdir(truth_dir):
     f1 = (f1_negative + f1_positive)/2
     acc = accuracy_score(df["Label"], df["LabelPrediction"])
 
-   
     print("MACRO F1: %f" % f1)
     print("ACC: %f" % acc)
 
