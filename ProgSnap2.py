@@ -74,6 +74,12 @@ class ProgSnap2Dataset:
                     self.main_table.sort_values(by=columns, inplace=True)
         return self.main_table.copy()
 
+    def set_main_table(self, main_table):
+        """ Overwrites the main table loaded from the file with the provided table.
+        This this table will be used for future operations, including copying the dataset.
+        """
+        self.main_table = main_table.copy()
+
     def get_code_states_table(self):
         """ Returns a Pandas DataFrame with the code states table form this dataset
         """
