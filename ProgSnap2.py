@@ -29,10 +29,17 @@ class PS2:
     SourceLocation = 'SourceLocation'
     Code = 'Code'
 
+    Version = 'Version'
+    IsEventOrderingConsistent = 'IsEventOrderingConsistent'
+    EventOrderScope = 'EventOrderScope'
+    EventOrderScopeColumns = 'EventOrderScopeColumns'
+    CodeStateRepresentation = 'CodeStateRepresentation'
+
 
 class ProgSnap2Dataset:
 
     MAIN_TABLE_FILE = 'MainTable.csv'
+    METADATA_TABLE_FILE = 'DatasetMetadata.csv'
     LINK_TABLE_DIR = 'LinkTables'
     CODE_STATES_DIR = 'CodeStates'
     CODE_STATES_TABLE_FILE = os.path.join(CODE_STATES_DIR, 'CodeStates.csv')
@@ -40,6 +47,7 @@ class ProgSnap2Dataset:
     def __init__(self, directory):
         self.directory = directory
         self.main_table = None
+        self.metadata_table = None
         self.code_states_table = None
 
     def path(self, local_path):
@@ -50,7 +58,20 @@ class ProgSnap2Dataset:
         """
         if self.main_table is None:
             self.main_table = pd.read_csv(self.path(ProgSnap2Dataset.MAIN_TABLE_FILE))
-            self.main_table.sort_values(by=[PS2.SubjectID, PS2.Order], inplace=True)
+            if self.get_metadata_property(PS2.IsEventOrderingConsistent):
+                order_scope = self.get_metadata_property(PS2.EventOrderScope)
+                if order_scope == 'Global':
+                    # If the table is globally ordered, sort it
+                    self.main_table.sort_values(by=[PS2.Order], inplace=True)
+                elif order_scope == 'Restricted':
+                    # If restricted ordered, sort first by grouping columns, then by order
+                    order_columns = self.get_metadata_property(PS2.EventOrderScopeColumns)
+                    if order_columns is None or len(order_columns) == 0:
+                        raise Exception('EventOrderScope is restricted by no EventOrderScopeColumns given')
+                    columns = order_columns.split(';')
+                    columns.append('Order')
+                    # The result is that _within_ these groups, events are ordered
+                    self.main_table.sort_values(by=columns, inplace=True)
         return self.main_table.copy()
 
     def get_code_states_table(self):
@@ -59,6 +80,28 @@ class ProgSnap2Dataset:
         if self.code_states_table is None:
             self.code_states_table = pd.read_csv(self.path(ProgSnap2Dataset.CODE_STATES_TABLE_FILE))
         return self.code_states_table.copy()
+
+    def get_metadata_property(self, property):
+        """ Returns the value of a given metadata property in the metadata table
+        """
+        if self.metadata_table is None:
+            self.metadata_table = pd.read_csv(self.path(ProgSnap2Dataset.METADATA_TABLE_FILE))
+
+        values = self.metadata_table[self.metadata_table['Property'] == property]['Value']
+        if len(values) == 1:
+            return values.iloc[0]
+        if len(values) > 1:
+            raise Exception('Multiple values for property: ' + property)
+
+        # Default return values as of V6
+        if property == PS2.IsEventOrderingConsistent:
+            return False
+        if property == PS2.EventOrderScope:
+            return 'None'
+        if property == PS2.EventOrderScopeColumns:
+            return ''
+
+        return None
 
     def __link_table_path(self):
         return self.path(ProgSnap2Dataset.LINK_TABLE_DIR)
@@ -78,6 +121,9 @@ class ProgSnap2Dataset:
             link_table += '.csv'
         return pd.read_csv(path.join(self.__link_table_path(), link_table))
 
+    def drop_main_table_column(self, column):
+        self.get_main_table().drop(column, axis=1, inplace=True)
+
     def save_subset(self, path, main_table_filterer, copy_link_tables=True):
         os.makedirs(os.path.join(path, ProgSnap2Dataset.CODE_STATES_DIR), exist_ok=True)
         main_table = main_table_filterer(self.get_main_table())
@@ -86,6 +132,7 @@ class ProgSnap2Dataset:
         code_states = self.get_code_states_table()
         code_states = code_states[code_states[PS2.CodeStateID].isin(code_state_ids)]
         code_states.to_csv(os.path.join(path, ProgSnap2Dataset.CODE_STATES_DIR, 'CodeStates.csv'), index=False)
+        self.metadata_table.to_csv(os.path.join(path, ProgSnap2Dataset.METADATA_TABLE_FILE), index=False)
 
         if not copy_link_tables:
             return
