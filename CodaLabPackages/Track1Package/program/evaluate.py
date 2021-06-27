@@ -24,8 +24,13 @@ if os.path.isdir(submit_dir) and os.path.isdir(truth_dir):
     true_csv = pd.read_csv(os.path.join(truth_dir, "truth.csv"))
     pred_csv = pd.read_csv(os.path.join(submit_dir, "predictions.csv"))
     
-    assert len(true_csv) == len(pred_csv), "Submission with wrong number of entries."
-    assert set(pred_csv["Label"]) != set([False,True]), "Submission should include probabilities rather than binary results."
+    assert len(true_csv) == len(pred_csv), "Submission with wrong number of entries: Should be " + str(len(true_csv))
+    assert 'SubjectID' in pred_csv.columns and 'ProblemID' in pred_csv.columns and 'Label' in pred_csv.columns, \
+        "Submission columns should be: SubjectID, ProblemID, Label"
+    assert set(true_csv['SubjectID']) == set(pred_csv['SubjectID']), "Submission SubjectIDs do not match."
+    assert set(true_csv['ProblemID']) == set(pred_csv['ProblemID']), "Submission ProblemIDs do not match."
+    assert set(pred_csv["Label"]) != set([False,True]), \
+        "Submission should include probabilities rather than binary results."
     
     df = true_csv.set_index(['SubjectID','ProblemID']).join(pred_csv.set_index(['SubjectID','ProblemID']), rsuffix="ScorePrediction")
     df["LabelPrediction"] = df["LabelScorePrediction"] > 0.5
