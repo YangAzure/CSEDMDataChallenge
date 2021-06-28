@@ -43,19 +43,19 @@ leaderboard:
             label: AUC
             rank: 1
             numeric_format: 1.00
-        Macro F1:
+        MACRO_F1:
             leaderboard: *RESULTS
-            label: MACRO F1
+            label: Macro F1
             rank: 2
             numeric_format: 1.00
-        Positive F1:
+        POSITIVE_F1:
             leaderboard: *RESULTS
-            label: POSITIVE F1
+            label: Positive F1
             rank: 3
             numeric_format: 1.00
-        Accuracy:
+        ACC:
             leaderboard: *RESULTS
-            label: ACC
+            label: Accuracy
             rank: 4
             numeric_format: 1.00 
         
