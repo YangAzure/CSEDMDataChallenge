@@ -1,5 +1,5 @@
-title: Example Hello World Competition
-description: An example competition where submissions should output "Hello World!"
+title: 2th CSEDM Challenge -- Student Struggling Prediction
+description: Tracking student programming traces and predicting their struggles in late problems.
 image: csedm image.jpeg
 has_registration: True
 html:
@@ -14,8 +14,24 @@ phases:
         start_date: 2013-06-30
         max_submissions: 100
         scoring_program: program.zip
-        reference_data: reference.zip
-        starting_kit: submission.zip
+        reference_data: reference1.zip
+        starting_kit: submission1.zip
+    2:
+        phasenumber: 1
+        label: "Second phase"
+        start_date: 2013-06-30
+        max_submissions: 100
+        scoring_program: program.zip
+        reference_data: reference2.zip
+        starting_kit: submission2.zip
+    3:
+        phasenumber: 1
+        label: "Third phase"
+        start_date: 2013-06-30
+        max_submissions: 100
+        scoring_program: program.zip
+        reference_data: reference3.zip
+        starting_kit: submission3.zip
 leaderboard:
     leaderboards:
         RESULTS: &RESULTS
