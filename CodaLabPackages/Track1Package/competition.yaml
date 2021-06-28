@@ -42,20 +42,20 @@ leaderboard:
             leaderboard: *RESULTS
             label: AUC
             rank: 1
-            numeric_format: 1.00
+            numeric_format: 4
         MACRO_F1:
             leaderboard: *RESULTS
             label: Macro F1
             rank: 2
-            numeric_format: 1.00
+            numeric_format: 4
         POSITIVE_F1:
             leaderboard: *RESULTS
             label: Positive F1
             rank: 3
-            numeric_format: 1.00
+            numeric_format: 4
         ACC:
             leaderboard: *RESULTS
             label: Accuracy
             rank: 4
-            numeric_format: 1.00 
+            numeric_format: 4 
         
