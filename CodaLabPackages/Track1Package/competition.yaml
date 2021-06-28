@@ -10,24 +10,24 @@ html:
 phases:
     1:
         phasenumber: 1
-        label: "First phase"
-        start_date: 2013-06-30
+        label: "Practice"
+        start_date: 2021-06-28
         max_submissions: 100
         scoring_program: program.zip
         reference_data: reference1.zip
         starting_kit: submission1.zip
     2:
-        phasenumber: 1
-        label: "Second phase"
-        start_date: 2013-06-30
+        phasenumber: 2
+        label: "Cross-Semester"
+        start_date: 2021-06-28
         max_submissions: 100
         scoring_program: program.zip
         reference_data: reference2.zip
         starting_kit: submission2.zip
     3:
-        phasenumber: 1
-        label: "Third phase"
-        start_date: 2013-06-30
+        phasenumber: 3
+        label: "Within-Semester"
+        start_date: 2022-02-07
         max_submissions: 100
         scoring_program: program.zip
         reference_data: reference3.zip
@@ -38,8 +38,24 @@ leaderboard:
             label: Results
             rank: 1
     columns:
-        correct:
+        AUC:
             leaderboard: *RESULTS
-            label: correct
+            label: AUC
             rank: 1
-            numeric_format: 1
+            numeric_format: 1.00
+        Macro F1:
+            leaderboard: *RESULTS
+            label: MACRO F1
+            rank: 2
+            numeric_format: 1.00
+        Positive F1:
+            leaderboard: *RESULTS
+            label: POSITIVE F1
+            rank: 3
+            numeric_format: 1.00
+        Accuracy:
+            leaderboard: *RESULTS
+            label: ACC
+            rank: 4
+            numeric_format: 1.00 
+        

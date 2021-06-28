@@ -47,8 +47,8 @@ if os.path.isdir(submit_dir) and os.path.isdir(truth_dir):
     print("ACC: %f" % acc)
     print("AUC: %f" % auc)
 
-    output_file.write(b"MACRO F1: %f \n" % f1)
-    output_file.write(b"POSITIVE F1: %f \n" % f1_positive)
+    output_file.write(b"MACRO_F1: %f \n" % f1)
+    output_file.write(b"POSITIVE_F1: %f \n" % f1_positive)
     output_file.write(b"ACC: %f \n" % acc)
     output_file.write(b"AUC: %f \n" % auc)
     output_file.close()
