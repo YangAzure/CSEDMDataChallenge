@@ -128,7 +128,8 @@ class ProgSnap2Dataset:
         return pd.read_csv(path.join(self.__link_table_path(), link_table))
 
     def drop_main_table_column(self, column):
-        self.get_main_table().drop(column, axis=1, inplace=True)
+        self.get_main_table()
+        self.main_table.drop(column, axis=1, inplace=True)
 
     def save_subset(self, path, main_table_filterer, copy_link_tables=True):
         os.makedirs(os.path.join(path, ProgSnap2Dataset.CODE_STATES_DIR), exist_ok=True)
