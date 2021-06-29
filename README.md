@@ -25,3 +25,9 @@ data/Release
  *Note: You may not yet have access to the F19/Train dataset yet. It will be released at the start of the Within-Semester phase of the competition.
 
  Each model is written as a jupyter notebook. To run them, make sure you have [Jupyter installed](https://jupyter.org/install).
+
+ You may need to `pip install` some required packages:
+ * pandas
+ * numpy
+ * matplotlib
+ * sklearn
